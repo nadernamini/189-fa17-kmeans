@@ -5,20 +5,18 @@ from dataset import get_data_and_monitor_digit_classification
 from kmeans import Kmeans
 
 
-def display_digit(digit, labeled=True, title=""):
+def display_digit(digit, title=""):
     """
     graphically displays a 784x1 vector, representing a digit
     """
-    if labeled:
-        digit = digit[1]
-    image = digit
     plt.figure()
-    fig = plt.imshow(image.reshape(28,28))
+    fig = plt.imshow(digit.reshape(28, 28))
     fig.set_cmap('gray_r')
     fig.axes.get_xaxis().set_visible(False)
     fig.axes.get_yaxis().set_visible(False)
     if title != "":
         plt.title("Inferred label: " + str(title))
+    plt.show()
 
 
 train_images, [train_labels, train_labels_one_hot], test_images, test_labels = \
@@ -26,7 +24,7 @@ train_images, [train_labels, train_labels_one_hot], test_images, test_labels = \
 
 k = len(np.unique(train_labels))
 
-
+print(test_images.shape)
 k_means = Kmeans(train_images, train_labels, k=k)
 
 k_means.run()
