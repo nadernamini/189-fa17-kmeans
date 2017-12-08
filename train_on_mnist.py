@@ -5,7 +5,7 @@ from dataset import get_data_and_monitor_digit_classification
 from kmeans import Kmeans
 
 
-def display_digit(digit, labeled = True, title = ""):
+def display_digit(digit, labeled=True, title=""):
     """
     graphically displays a 784x1 vector, representing a digit
     """
@@ -26,6 +26,14 @@ train_images, [train_labels, train_labels_one_hot], test_images, test_labels = \
 
 k = len(np.unique(train_labels))
 
-k_means = Kmeans(train_images, k=k)
+
+k_means = Kmeans(train_images, train_labels, k=k)
 
 k_means.run()
+
+num_tests = 1
+
+idx = np.random.choice(test_images.shape[0], num_tests, replace=False)
+labels = k_means.classify(test_images[idx])
+for j, id in enumerate(idx):
+    display_digit(test_images[id], labels[j])

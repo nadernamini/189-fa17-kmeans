@@ -2,11 +2,13 @@ import numpy as np
 
 
 class Kmeans:
-    def __init__(self, data, k=25):
+    def __init__(self, data, labels, k=25):
         self.partitions = [set() for _ in range(k)]
         self.means = []
+        self.labeled_means = []
         self.k = k
         self.data = data
+        self.label = labels
         # K-means++
         self.initialize_means()
 
@@ -51,14 +53,15 @@ class Kmeans:
 
         self.means = means
 
-    def find_closest(self, i):
+    def find_closest(self, i, data):
         """
         finds the index of the closest mean.
         :param i: the i-th row of the train_data to look at
+        :param data: the data to use for finding the closest mean
         :return: the index of the closest mean
         """
         dist, k = float('inf'), i
-        row = self.data[i]
+        row = data[i]
         for j, mean in enumerate(self.means):
             new = np.linalg.norm(mean - row) ** 2
             if new < dist:
@@ -72,7 +75,7 @@ class Kmeans:
         """
         changed = False
         for i in range(self.data.shape[0]):
-            k = self.find_closest(i)
+            k = self.find_closest(i, self.data)
             if i not in self.partitions[k]:
                 changed = True
                 self.partitions[k].add(i)
@@ -99,6 +102,23 @@ class Kmeans:
         while changed:
             changed = self.assignment_step()
             self.update_step()
+        self.label_centroids()
+
+    def label_centroids(self):
+        """
+        labels the centroids to have the name of the most common label
+        :return: None
+        """
+        labels = []
+        for i in range(self.k):
+            unique_labels, counts = np.unique(self.label[list(self.partitions[i])], return_counts=True)
+            label = unique_labels[np.argmax(counts)]
+            labels.append(label)
+        self.labeled_means = labels
 
     def classify(self, data):
-        for i in range
+        labels = np.zeros((data.shape[0],))
+        for i in range(data.shape[0]):
+            k = self.find_closest(i, data)
+            labels[i] = self.labeled_means[k]
+        return labels
